@@ -38,7 +38,7 @@ namespace UserStorageServices
             if (string.IsNullOrWhiteSpace(user.LastName))
             {
                 throw new ArgumentException("LastName is null or empty or whitespace", nameof(user));
-            }
+            } 
 
             if (user.Age < 3 || user.Age > 120)
             {
