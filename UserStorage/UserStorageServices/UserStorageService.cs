@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace UserStorageServices
 {
@@ -7,6 +8,11 @@ namespace UserStorageServices
     /// </summary>
     public class UserStorageService
     {
+        /// <summary>
+        /// Users set
+        /// </summary>
+        private readonly HashSet<User> users;
+
         /// <summary>
         /// Gets the number of elements contained in the storage.
         /// </summary>
@@ -29,7 +35,17 @@ namespace UserStorageServices
                 throw new ArgumentException("FirstName is null or empty or whitespace", nameof(user));
             }
 
-            // TODO: Implement Add() method and all other validation rules.
+            if (string.IsNullOrWhiteSpace(user.LastName))
+            {
+                throw new ArgumentException("LastName is null or empty or whitespace", nameof(user));
+            }
+
+            if (user.Age < 3 || user.Age > 120)
+            {
+                throw new ArgumentException("Age doesn't make sense", nameof(user));
+            }
+
+            users.Add(user);            
         }
 
         /// <summary>

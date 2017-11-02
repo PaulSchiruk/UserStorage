@@ -1,4 +1,7 @@
-﻿namespace UserStorageServices
+﻿using System;
+using System.Collections.Generic;
+
+namespace UserStorageServices
 {
     /// <summary>
     /// Represents a user.
@@ -8,7 +11,7 @@
         /// <summary>
         /// Id prop
         /// </summary>
-        public System.Guid Id { get; set; }
+        public Guid Id { get; } = Guid.NewGuid();
 
         /// <summary>
         /// Gets or sets a user first name.
