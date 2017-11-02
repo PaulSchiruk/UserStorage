@@ -6,6 +6,11 @@
     public class User
     {
         /// <summary>
+        /// Id prop
+        /// </summary>
+        public System.Guid Id { get; set; }
+
+        /// <summary>
         /// Gets or sets a user first name.
         /// </summary>
         public string FirstName { get; set; }
