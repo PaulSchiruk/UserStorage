@@ -169,7 +169,7 @@ Review and commit.
 
 Review and commit.
 
-- [ ] Add a new bool field _IsLoggingEnabled_ to _UserStorageService_ class, and add logging functionality to Add method:
+- [x] Add a new bool field _IsLoggingEnabled_ to _UserStorageService_ class, and add logging functionality to Add method:
 
 ```cs
 if (IsLoggingEnabled)
@@ -180,7 +180,7 @@ if (IsLoggingEnabled)
 
 Add logging to Remove and Search methods too. Review and commit.
 
-- [ ] Run StyleCop to make sure the code you have added fits defined code standards. Fix all code issues StyleCop identified. Review and commit.
+- [x] Run StyleCop to make sure the code you have added fits defined code standards. Fix all code issues StyleCop identified. Review and commit.
 
 ```sh
 $ git status
@@ -188,7 +188,7 @@ $ git diff
 $ git commit -m "Fix StyleCop issues."
 ```
 
-- [ ] Mark all completed items in README.md. Review and commit.
+- [x] Mark all completed items in README.md. Review and commit.
 
 - Publish "step1" branch to [remote branch](https://git-scm.com/book/ru/v2/Ветвление-в-Git-Удалённые-ветки) on github.
 
