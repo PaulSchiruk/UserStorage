@@ -160,9 +160,9 @@ Test-First: add use cases in form of tests to _UserStorageServiceTests_ class (*
 
 Review and commit.
 
-- [ ] Test-First: add use cases (red) and then add an implementation for Remove method (green). Review. Commit.
+- [x] Test-First: add use cases (red) and then add an implementation for Remove method (green). Review. Commit.
 
-- [ ] Test-First: add use cases (red) and then add an implementation for Search method (green). Use cases:
+- [x] Test-First: add use cases (red) and then add an implementation for Search method (green). Use cases:
   * Search by FirstName.
   * Search by LastName.
   * Search by Age.

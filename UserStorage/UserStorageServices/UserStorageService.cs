@@ -14,6 +14,9 @@ namespace UserStorageServices
         /// </summary>
         private readonly HashSet<User> users;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public UserStorageService()
         {
             users = new HashSet<User>();
@@ -26,11 +29,21 @@ namespace UserStorageServices
         public int Count { get; }
 
         /// <summary>
+        /// 
+        /// </summary>
+        private bool IsLoggingEnabled { get; set; }        
+
+        /// <summary>
         /// Adds a new <see cref="User"/> to the storage.
         /// </summary>
         /// <param name="user">A new <see cref="User"/> that will be added to the storage.</param>
         public void Add(User user)
         {
+            if (IsLoggingEnabled)
+            {
+                Console.WriteLine("Add() method is called.");
+            }
+
             if (user == null)
             {
                 throw new ArgumentNullException(nameof(user));
@@ -44,14 +57,14 @@ namespace UserStorageServices
             if (string.IsNullOrWhiteSpace(user.LastName))
             {
                 throw new ArgumentException("LastName is null or empty or whitespace", nameof(user));
-            } 
+            }
 
             if (user.Age < 3 || user.Age > 120)
             {
                 throw new ArgumentException("Age doesn't make sense", nameof(user));
             }
 
-            users.Add(user);            
+            users.Add(user);
         }
 
         /// <summary>
@@ -59,6 +72,11 @@ namespace UserStorageServices
         /// </summary>
         public void Remove()
         {
+            if (IsLoggingEnabled)
+            {
+                Console.WriteLine("Remove() method is called.");
+            }
+
             users.Clear();
         }
 
@@ -67,6 +85,11 @@ namespace UserStorageServices
         /// </summary>
         public IEnumerable<User> Search(Predicate<User> comparer)
         {
+            if (IsLoggingEnabled)
+            {
+                Console.WriteLine("Search() method is called.");
+            }
+
             if (comparer == null)
             {
                 throw new ArgumentNullException(nameof(comparer));
@@ -82,6 +105,11 @@ namespace UserStorageServices
         /// <returns></returns>
         public IEnumerable<User> SearchByFirstName(string firstName)
         {
+            if (IsLoggingEnabled)
+            {
+                Console.WriteLine("SearchByFirstName(string firstName) method is called.");
+            }
+
             if (firstName == null)
             {
                 throw new ArgumentNullException("FirstName invalid");
@@ -97,6 +125,11 @@ namespace UserStorageServices
         /// <returns></returns>
         public IEnumerable<User> SearchByLastName(string lastName)
         {
+            if (IsLoggingEnabled)
+            {
+                Console.WriteLine("SearchByLactName(string lastName) method is called.");
+            }
+
             if (lastName == null)
             {
                 throw new ArgumentNullException("LastName invalid");
@@ -112,6 +145,11 @@ namespace UserStorageServices
         /// <returns></returns>
         public IEnumerable<User> SearchByAge(int age)
         {
+            if (IsLoggingEnabled)
+            {
+                Console.WriteLine("SearchByAge(int age) method is called.");
+            }
+
             if (age < 3 || age > 120)
             {
                 throw new ArgumentException("Age invalid");
