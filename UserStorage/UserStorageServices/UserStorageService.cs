@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace UserStorageServices
 {
@@ -12,6 +13,11 @@ namespace UserStorageServices
         /// Users set
         /// </summary>
         private readonly HashSet<User> users;
+
+        public UserStorageService()
+        {
+            users = new HashSet<User>();
+        }
 
         /// <summary>
         /// Gets the number of elements contained in the storage.
@@ -53,15 +59,65 @@ namespace UserStorageServices
         /// </summary>
         public void Remove()
         {
-            // TODO: Implement Remove() method.
+            users.Clear();
         }
 
         /// <summary>
         /// Searches through the storage for a <see cref="User"/> that matches specified criteria.
         /// </summary>
-        public void Search()
+        public IEnumerable<User> Search(Predicate<User> comparer)
         {
-            // TODO: Implement Search() method.
+            if (comparer == null)
+            {
+                throw new ArgumentNullException(nameof(comparer));
+            }
+
+            return users.Select(x => x).Where(x => comparer(x));
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="firstName"></param>
+        /// <returns></returns>
+        public IEnumerable<User> SearchByFirstName(string firstName)
+        {
+            if (firstName == null)
+            {
+                throw new ArgumentNullException("FirstName invalid");
+            }
+
+            return Search(x => x.FirstName == firstName);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lastName"></param>
+        /// <returns></returns>
+        public IEnumerable<User> SearchByLastName(string lastName)
+        {
+            if (lastName == null)
+            {
+                throw new ArgumentNullException("LastName invalid");
+            }
+
+            return Search(x => x.LastName == lastName);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="age"></param>
+        /// <returns></returns>
+        public IEnumerable<User> SearchByAge(int age)
+        {
+            if (age < 3 || age > 120)
+            {
+                throw new ArgumentException("Age invalid");
+            }
+
+            return Search(x => x.Age == age);
         }
     }
 }
