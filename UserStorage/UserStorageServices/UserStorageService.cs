@@ -7,7 +7,7 @@ namespace UserStorageServices
     /// <summary>
     /// Represents a service that stores a set of <see cref="User"/>s and allows to search through them.
     /// </summary>
-    public class UserStorageService
+    public class UserStorageService : IUserStorageService
     {
         /// <summary>
         /// Users set
@@ -57,14 +57,14 @@ namespace UserStorageServices
         /// <summary>
         /// Removes an existed <see cref="User"/> from the storage.
         /// </summary>
-        public void Remove()
+        public bool Remove(User user)
         {
             if (IsLoggingEnabled)
             {
                 Console.WriteLine("Remove() method is called.");
             }
 
-            users.Clear();
+            return users.Remove(user);
         }
 
         /// <summary>
