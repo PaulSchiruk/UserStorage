@@ -17,6 +17,11 @@ namespace UserStorageServices
         /// <summary>
         /// 
         /// </summary>
+        private readonly IUserValidate userValidate;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public UserStorageService()
         {
             users = new HashSet<User>();
@@ -44,25 +49,7 @@ namespace UserStorageServices
                 Console.WriteLine("Add() method is called.");
             }
 
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
-
-            if (string.IsNullOrWhiteSpace(user.FirstName))
-            {
-                throw new ArgumentException("FirstName is null or empty or whitespace", nameof(user));
-            }
-
-            if (string.IsNullOrWhiteSpace(user.LastName))
-            {
-                throw new ArgumentException("LastName is null or empty or whitespace", nameof(user));
-            }
-
-            if (user.Age < 3 || user.Age > 120)
-            {
-                throw new ArgumentException("Age doesn't make sense", nameof(user));
-            }
+            userValidate.Validate(user);
 
             users.Add(user);
         }
