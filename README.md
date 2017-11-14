@@ -220,11 +220,11 @@ The class diagram below shows the application state after all refactorings in th
 
 ![Client and UserStorageService Step 2](images/ClientAndServiceStep2.png "Client and UserStorageService Step 2")
 
-- [ ] Create a new branch with name "step2", and switch to this branch.
+- [x] Create a new branch with name "step2", and switch to this branch.
 
 _UserStorageService_ is responsible not only for storing user records, but also for generating new identifier and data validation. You will apply [Single Responsibility Principle (SRP)](http://sergeyteplyakov.blogspot.com.by/2014/08/single-responsibility-principle.html) to the service in the next two refactorings.
 
-- [ ] [Extract Class refactoring](https://refactoring.guru/extract-class): extract [strategy](https://refactoring.guru/design-patterns/strategy) of generating new user identifier into a new class.
+- [x] [Extract Class refactoring](https://refactoring.guru/extract-class): extract [strategy](https://refactoring.guru/design-patterns/strategy) of generating new user identifier into a new class.
   * Create a new interface in _UserStorageServices_ project, give it a meaningful name.
   * Test-First: create a new class in _UserStorageServices_ project that implements the interface, and move your code (generation of a new identifier) from _UserStorageService_ class to your new class.
   * Modify _UserStorageService_ to create a new instance of your new class, and use it to generate an identifier when adding a new user.
@@ -233,7 +233,7 @@ Run all tests to make sure that _UserStorageService_ works as expected.
 
 Review and commit.
 
-- [ ] Extract Class: extract strategy of validating user data when adding a new user to the storage.
+- [x] Extract Class: extract strategy of validating user data when adding a new user to the storage.
   * Create a new interface in _UserStorageServices_ project, give it a meaningful name.
   * Test-First: create a new class in _UserStorageServices_ project that implements the interface, and move your code (validation of the user data) from _UserStorageService_ class to your new class.
   * Modify _UserStorageService_ to create a new instance of your new class, and use it to validate a user data when adding a new user.
@@ -242,7 +242,7 @@ Run all tests to make sure that _UserStorageService_ works as expected.
 
 Review and commit.
 
-- [ ] [Extract Interface](https://refactoring.guru/extract-interface): extract an interface for the UserStorageService class.
+- [x] [Extract Interface](https://refactoring.guru/extract-interface): extract an interface for the UserStorageService class.
   * Create a new interface _IUserStorageService_ in _UserStorageServices_ project, give it a meaningful name.
   * Add all public methods and properties from _UserStorageService_ class to your new interface.
   * Refactor _userStorageService field in _Client_ class: change the field type to your new interface.
@@ -250,7 +250,7 @@ Review and commit.
 
 Run tests, review and commit.
 
-- [ ] Configure logging using App.config.
+- [x] Configure logging using App.config.
   * Refactor your _UserStorageService_ class to use [boolean switch](https://msdn.microsoft.com/en-us/library/system.diagnostics.booleanswitch%28v=vs.110%29.aspx) instead of _IsLoggingEnabled_ property.
   * Use _enableLogging_ boolean switch that is already added to your App.config.
   * Remove unnecessary _IsLoggingEnabled_ property.
@@ -258,9 +258,9 @@ Run tests, review and commit.
 
 Run tests, review and commit.
 
-- [ ] Run StyleCop. Fix issues. Commit.
+- [x] Run StyleCop. Fix issues. Commit.
 
-- [ ] Mark. Commit.
+- [x] Mark. Commit.
 
 - Publish "step2" branch to github.
 
@@ -269,9 +269,9 @@ Run tests, review and commit.
 
 ## Step 3 - Compose and decorate
 
-- [ ] New branch "step3".
+- [x] New branch "step3".
 
-- [ ] Composite validator.
+- [x] Composite validator.
   * Refactor your class that validates user data to extract validation logic for each validation rule to a separate class.
   * Use [Composite design pattern](https://refactoring.guru/design-patterns/composite) to create a composite validator.
 
@@ -279,11 +279,11 @@ Run tests, review and commit.
 
 Run tests, review and commit.
 
-- [ ] Validation exceptions. Create a custom exception for each validation case. Examples: FirstNameIsNullOrEmptyException, LastNameExceedsLimitsException, AgeExceedsLimitsException. Each validator rule class should throw its own exception. Modify tests.
+- [x] Validation exceptions. Create a custom exception for each validation case. Examples: FirstNameIsNullOrEmptyException, LastNameExceedsLimitsException, AgeExceedsLimitsException. Each validator rule class should throw its own exception. Modify tests.
 
 Run tests, review and commit.
 
-- [ ] Extended search functionality. Add new functionality to your Search method for supporting these use cases:
+- [x] Extended search functionality. Add new functionality to your Search method for supporting these use cases:
   * Search by FirstName and LastName.
   * Search by FirstName and Age.
   * Search by LastName and Age.
@@ -291,7 +291,7 @@ Run tests, review and commit.
 
 Add new tests. Run tests, review and commit.
 
-- [ ] Extract logging functionality.
+- [x] Extract logging functionality.
   * Extract Class: extract logging functionality to a separate class that inherits _IUserStorageService_ interface.
   * Use [Decorator design pattern](https://refactoring.guru/design-patterns/decorator) to create a log decorator.
   * Make _UserStorageServiceDecorator_ class abstract.
@@ -301,7 +301,7 @@ Add new tests. Run tests, review and commit.
 
 Run tests, review and commit.
 
-- [ ] Refactor _UserStorageServiceLog_ to use [Trace Listeners](https://docs.microsoft.com/en-us/dotnet/framework/debug-trace-profile/trace-listeners) to log all _UserStorageService_ method calls.
+- [x] Refactor _UserStorageServiceLog_ to use [Trace Listeners](https://docs.microsoft.com/en-us/dotnet/framework/debug-trace-profile/trace-listeners) to log all _UserStorageService_ method calls.
   * Configure [TextWriterTraceListener](https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.textwritertracelistener) [by using a configuration file](https://docs.microsoft.com/en-us/dotnet/framework/debug-trace-profile/how-to-create-and-initialize-trace-listeners).
   * Replace Console.WriteLine method calls with appropriate Debug or Trace methods.
   * Add more listeners to the App.config to support console, XML and CSV output.
@@ -309,7 +309,7 @@ Run tests, review and commit.
 
 Run tests, review and commit.
 
-- [ ] Run StyleCop, fix issues, commit. Mark, commit. Publish "step3". Merge "step3" into master. Publish.
+- [x] Run StyleCop, fix issues, commit. Mark, commit. Publish "step3". Merge "step3" into master. Publish.
 
 
 ## Step 4 - Master-Slave
