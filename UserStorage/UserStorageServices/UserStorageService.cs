@@ -6,11 +6,19 @@ using UserStorageServices.Exceptions;
 
 namespace UserStorageServices
 {
+    public enum UserStorageServiceMode
+    {
+        MasterNode,
+        SlaveNode
+    }
+
     /// <summary>
     /// Represents a service that stores a set of <see cref="User"/>s and allows to search through them.
     /// </summary>
     public class UserStorageService : IUserStorageService
     {
+        private readonly UserStorageServiceMode mode;
+
         /// <summary>
         /// Users set
         /// </summary>
@@ -20,6 +28,18 @@ namespace UserStorageServices
         /// 
         /// </summary>
         private readonly IUserValidate userValidate;
+
+        private List<IUserStorageService> slaveServices;
+
+        public UserStorageService(UserStorageServiceMode mode, IEnumerable<IUserStorageService> slaves = null) : this()
+        {
+            this.mode = mode;
+
+            if (mode == UserStorageServiceMode.MasterNode && slaves != null)
+            {
+                this.slaveServices = slaves.ToList();
+            }
+        }
 
         /// <summary>
         /// 
@@ -41,22 +61,52 @@ namespace UserStorageServices
         /// <param name="user">A new <see cref="User"/> that will be added to the storage.</param>
         public void Add(User user)
         {
+            if (!OperationAllowed())
+            {
+                throw new NotSupportedException();
+            }
+
             userValidate.Validate(user);
 
-            users.Add(user);
+            if (mode == UserStorageServiceMode.MasterNode)
+            {
+                foreach (var service in slaveServices)
+                {
+                    service.Add(user);
+                }
+            }
+            else
+            {
+                this.users.Add(user);
+            }            
         }
 
         /// <summary>
         /// Removes an existed <see cref="User"/> from the storage.
         /// </summary>
-        public bool Remove(User user)
+        public void Remove(User user)
         {
             if (user == null)
             {
                 throw new ArgumentNullException(nameof(user));
             }
 
-            return users.Remove(user);
+            if (!OperationAllowed())
+            {
+                throw new NotSupportedException();
+            }
+
+            if (mode == UserStorageServiceMode.MasterNode)
+            {
+                foreach (var service in slaveServices)
+                {
+                    service.Remove(user);
+                }
+            }
+            else
+            {
+                this.users.Remove(user);
+            }            
         }
 
         /// <summary>
@@ -69,7 +119,23 @@ namespace UserStorageServices
                 throw new ArgumentNullException(nameof(comparer));
             }
 
-            return users.Select(x => x).Where(x => comparer(x));
+            if (mode == UserStorageServiceMode.SlaveNode)
+            {
+                return this.Search(comparer);
+            }
+            else
+            {
+                List<User> result = new List<User>();
+                foreach (var service in slaveServices)
+                {
+                    if (service.Search(comparer) != null)
+                    {
+                        result.AddRange(service.Search(comparer));
+                    }
+                }
+
+                return result;
+            }
         }
 
         /// <summary>
@@ -180,6 +246,28 @@ namespace UserStorageServices
             }
 
             return Search(x => x.FirstName == firstName && x.LastName == lastName && x.Age == age);
+        }
+
+        private bool OperationAllowed()
+        {
+            StackTrace stack = new StackTrace();
+            var currentMethod = stack.GetFrame(1).GetMethod();
+            var stackFramesContainsCurrentMethod = stack.GetFrames();
+            var counterOfSameFrames = 0;
+            foreach (var frame in stackFramesContainsCurrentMethod)
+            {
+                if (frame.GetMethod() == currentMethod)
+                {
+                    counterOfSameFrames++;
+                }
+
+                if (counterOfSameFrames >= 2)
+                {
+                    break;
+                }
+            }
+
+            return mode == UserStorageServiceMode.MasterNode || counterOfSameFrames >= 2;
         }
     }
 }

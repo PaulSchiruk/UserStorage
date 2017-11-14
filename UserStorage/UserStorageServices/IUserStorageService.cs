@@ -12,7 +12,7 @@ namespace UserStorageServices
 
         void Add(User user);
 
-        bool Remove(User user);
+        void Remove(User user);
 
         IEnumerable<User> SearchByFirstName(string firstName);
 

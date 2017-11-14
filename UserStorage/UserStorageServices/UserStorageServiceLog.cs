@@ -38,14 +38,14 @@ namespace UserStorageServices
             StorageService.Add(user);
         }
 
-        public override bool Remove(User user)
+        public override void Remove(User user)
         {
             if (this.logging.Enabled)
             {
                 Trace.WriteLine("Remove() method is called.");
             }
 
-            return StorageService.Remove(user);
+            StorageService.Remove(user);
         }
 
         public override IEnumerable<User> SearchByFirstName(string firstName)
