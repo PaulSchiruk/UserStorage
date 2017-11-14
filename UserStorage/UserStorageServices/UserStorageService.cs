@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using UserStorageServices.Exceptions;
 
 namespace UserStorageServices
 {
@@ -105,7 +106,7 @@ namespace UserStorageServices
 
             if (firstName == null)
             {
-                throw new ArgumentNullException("FirstName invalid");
+                throw new FirstNameIsNullOrEmptyException("FirstName invalid");
             }
 
             return Search(x => x.FirstName == firstName);
@@ -125,7 +126,7 @@ namespace UserStorageServices
 
             if (lastName == null)
             {
-                throw new ArgumentNullException("LastName invalid");
+                throw new LastNameIsNullOrEmptyException("LastName invalid");
             }
 
             return Search(x => x.LastName == lastName);
@@ -145,10 +146,75 @@ namespace UserStorageServices
 
             if (age < 3 || age > 120)
             {
-                throw new ArgumentException("Age invalid");
+                throw new AgeExceedsLimitsException("Age invalid");
             }
 
             return Search(x => x.Age == age);
+        }
+
+        public IEnumerable<User> SearchByFirstNameAndLastName(string firstName, string lastName)
+        {
+            if (string.IsNullOrWhiteSpace(firstName))
+            {
+                throw new FirstNameIsNullOrEmptyException("FirstName is null or empty");
+            }
+
+            if (string.IsNullOrWhiteSpace(lastName))
+            {
+                throw new LastNameIsNullOrEmptyException("LastName is null or empty");
+            }
+
+            return Search(x => x.FirstName == firstName && x.LastName == lastName);
+        }
+
+        public IEnumerable<User> SearchByFirstNameAndAge(string firstName, int age)
+        {
+            if (string.IsNullOrWhiteSpace(firstName))
+            {
+                throw new FirstNameIsNullOrEmptyException("FirstName is null or empty");
+            }
+
+            if (age < 3 || age > 120)
+            {
+                throw new AgeExceedsLimitsException("Age invalid");
+            }
+
+            return Search(x => x.FirstName == firstName && x.Age == age);
+        }
+
+        public IEnumerable<User> SearchByLastNameAndAge(string lastName, int age)
+        {
+            if (string.IsNullOrWhiteSpace(lastName))
+            {
+                throw new LastNameIsNullOrEmptyException("LastName is null or empty");
+            }
+
+            if (age < 3 || age > 120)
+            {
+                throw new AgeExceedsLimitsException("Age invalid");
+            }
+
+            return Search(x => x.LastName == lastName && x.Age == age);
+        }
+
+        public IEnumerable<User> SearchByFirstNameAndLastNameAndAge(string firstName, string lastName, int age)
+        {
+            if (string.IsNullOrWhiteSpace(firstName))
+            {
+                throw new FirstNameIsNullOrEmptyException("FirstName is null or empty");
+            }
+
+            if (string.IsNullOrWhiteSpace(lastName))
+            {
+                throw new LastNameIsNullOrEmptyException("LastName is null or empty");
+            }
+
+            if (age < 3 || age > 120)
+            {
+                throw new AgeExceedsLimitsException("Age invalid");
+            }
+
+            return Search(x => x.FirstName == firstName && x.LastName == lastName && x.Age == age);
         }
     }
 }
