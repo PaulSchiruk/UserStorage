@@ -29,7 +29,9 @@ namespace UserStorageServices
         /// </summary>
         private readonly IUserValidate userValidate;
 
-        private List<IUserStorageService> slaveServices;
+        private List<IUserStorageService> slaveServices = new List<IUserStorageService>();
+
+        private List<INotificationSubscriber> subscribers = new List<INotificationSubscriber>();
 
         public UserStorageService(UserStorageServiceMode mode, IEnumerable<IUserStorageService> slaves = null) : this()
         {
@@ -37,7 +39,16 @@ namespace UserStorageServices
 
             if (mode == UserStorageServiceMode.MasterNode && slaves != null)
             {
+                subscribers = new List<INotificationSubscriber>();
+
+                slaveServices = new List<IUserStorageService>();
+
                 this.slaveServices = slaves.ToList();
+
+                foreach (var sub in slaves)
+                {
+                    subscribers.Add((INotificationSubscriber)sub);
+                }
             }
         }
 
@@ -68,7 +79,7 @@ namespace UserStorageServices
 
             userValidate.Validate(user);
 
-            if (mode == UserStorageServiceMode.MasterNode)
+            if (mode == UserStorageServiceMode.MasterNode && slaveServices != null)
             {
                 foreach (var service in slaveServices)
                 {
@@ -78,7 +89,41 @@ namespace UserStorageServices
             else
             {
                 this.users.Add(user);
-            }            
+            }
+
+            if (mode == UserStorageServiceMode.MasterNode)
+            {
+                foreach (var sub in subscribers)
+                {
+                    sub.UserAdded(user);
+                }
+            }
+        }
+
+        public void UserAdded(User user)
+        {
+            Trace.Write("For Subscriber : User added");
+        }
+
+        public void UserRemoved(User user)
+        {
+
+            Trace.Write("For Subscriber : User removed");
+        }
+
+        public void AddSubscriber(INotificationSubscriber sub)
+        {
+            if (mode == UserStorageServiceMode.SlaveNode) return;
+            if (sub == null) throw new ArgumentNullException($"{nameof(sub)} is null");
+            subscribers.Add(sub);
+        }
+
+        public void RemoveSubscriber(INotificationSubscriber sub)
+        {
+            if (mode == UserStorageServiceMode.SlaveNode) return;
+            if (sub == null) throw new ArgumentNullException($"{nameof(sub)} is null");
+            if (!subscribers.Contains(sub)) throw new InvalidOperationException("No such subscruber was found");
+            subscribers.Remove(sub);
         }
 
         /// <summary>
@@ -105,8 +150,19 @@ namespace UserStorageServices
             }
             else
             {
-                this.users.Remove(user);
-            }            
+                if (!this.users.Remove(user))
+                {
+                    throw new ArgumentNullException("No user with such Id was found");
+                }
+            }
+
+            if (mode == UserStorageServiceMode.MasterNode)
+            {
+                foreach (var sub in subscribers)
+                {
+                    sub.UserRemoved(user);
+                }
+            }
         }
 
         /// <summary>
