@@ -35,7 +35,7 @@ namespace UserStorageServices.Tests
             userStorageService.Add(new User
             {
                 FirstName = null,
-                Age = 5
+                Age = 15
             });
 
             // Assert - [ExpectedException]
@@ -253,6 +253,5 @@ namespace UserStorageServices.Tests
             Assert.AreEqual(0, res.Count());
         }
         #endregion
-
     }
 }

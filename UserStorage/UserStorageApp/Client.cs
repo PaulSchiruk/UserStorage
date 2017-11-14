@@ -14,7 +14,7 @@ namespace UserStorageApp
         /// </summary>
         public Client(IUserStorageService _userStorageService = null)
         {
-            this._userStorageService = _userStorageService ?? new UserStorageService();
+            this._userStorageService = _userStorageService ?? new UserStorageServiceLog(new UserStorageService());
         }
 
         /// <summary>

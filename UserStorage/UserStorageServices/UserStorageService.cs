@@ -24,11 +24,6 @@ namespace UserStorageServices
         /// <summary>
         /// 
         /// </summary>
-        private readonly BooleanSwitch logging = new BooleanSwitch("enableLogging", "switch in app.config");
-
-        /// <summary>
-        /// 
-        /// </summary>
         public UserStorageService()
         {
             users = new HashSet<User>();
@@ -46,11 +41,6 @@ namespace UserStorageServices
         /// <param name="user">A new <see cref="User"/> that will be added to the storage.</param>
         public void Add(User user)
         {
-            if (logging.Enabled)
-            {
-                Console.WriteLine("Add() method is called.");
-            }
-
             userValidate.Validate(user);
 
             users.Add(user);
@@ -66,11 +56,6 @@ namespace UserStorageServices
                 throw new ArgumentNullException(nameof(user));
             }
 
-            if (logging.Enabled)
-            {
-                Console.WriteLine("Remove() method is called.");
-            }
-
             return users.Remove(user);
         }
 
@@ -79,11 +64,6 @@ namespace UserStorageServices
         /// </summary>
         public IEnumerable<User> Search(Predicate<User> comparer)
         {
-            if (logging.Enabled)
-            {
-                Console.WriteLine("Search() method is called.");
-            }
-
             if (comparer == null)
             {
                 throw new ArgumentNullException(nameof(comparer));
@@ -99,11 +79,6 @@ namespace UserStorageServices
         /// <returns></returns>
         public IEnumerable<User> SearchByFirstName(string firstName)
         {
-            if (logging.Enabled)
-            {
-                Console.WriteLine("SearchByFirstName(string firstName) method is called.");
-            }
-
             if (firstName == null)
             {
                 throw new FirstNameIsNullOrEmptyException("FirstName invalid");
@@ -119,11 +94,6 @@ namespace UserStorageServices
         /// <returns></returns>
         public IEnumerable<User> SearchByLastName(string lastName)
         {
-            if (logging.Enabled)
-            {
-                Console.WriteLine("SearchByLactName(string lastName) method is called.");
-            }
-
             if (lastName == null)
             {
                 throw new LastNameIsNullOrEmptyException("LastName invalid");
@@ -139,11 +109,6 @@ namespace UserStorageServices
         /// <returns></returns>
         public IEnumerable<User> SearchByAge(int age)
         {
-            if (logging.Enabled)
-            {
-                Console.WriteLine("SearchByAge(int age) method is called.");
-            }
-
             if (age < 3 || age > 120)
             {
                 throw new AgeExceedsLimitsException("Age invalid");
