@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UserStorageServices.Exceptions;
 
 namespace UserStorageServices.Validation
 {
@@ -12,7 +13,7 @@ namespace UserStorageServices.Validation
         {
             if (user.Age < 3 || user.Age > 120)
             {
-                throw new ArgumentException("Age doesn't make sense", nameof(user));
+                throw new AgeExceedsLimitsException("Age doesn't make sense");
             }
         }
     }
