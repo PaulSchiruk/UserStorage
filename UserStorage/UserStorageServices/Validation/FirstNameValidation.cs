@@ -7,7 +7,7 @@ using UserStorageServices.Exceptions;
 
 namespace UserStorageServices.Validation
 {
-    public class FirstNameValidation : IUserValidate
+    public class FirstNameValidation : IUserValidate<User>
     {
         public void Validate(User user)
         {

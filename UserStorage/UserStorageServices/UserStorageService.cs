@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using UserStorageServices.Exceptions;
+using UserStorageServices.Validation;
 
 namespace UserStorageServices
 {
@@ -15,10 +16,8 @@ namespace UserStorageServices
     /// <summary>
     /// Represents a service that stores a set of <see cref="User"/>s and allows to search through them.
     /// </summary>
-    public class UserStorageService : IUserStorageService
+    public abstract class UserStorageServiceBase : Switch, IUserStorageService, INotificationSubscriber
     {
-        private readonly UserStorageServiceMode mode;
-
         /// <summary>
         /// Users set
         /// </summary>
@@ -27,37 +26,34 @@ namespace UserStorageServices
         /// <summary>
         /// 
         /// </summary>
-        private readonly IUserValidate userValidate;
+        private readonly IUserValidate<User> userValidate;
 
-        private List<IUserStorageService> slaveServices = new List<IUserStorageService>();
-
-        private List<INotificationSubscriber> subscribers = new List<INotificationSubscriber>();
-
-        public UserStorageService(UserStorageServiceMode mode, IEnumerable<IUserStorageService> slaves = null) : this()
+        protected UserStorageServiceBase(IUserValidate<User> userValidate) : base("enableLogging", "If logging enabled")
         {
-            this.mode = mode;
+            this.userValidate = userValidate;
 
-            if (mode == UserStorageServiceMode.MasterNode && slaves != null)
+            if (this.userValidate == null)
             {
-                subscribers = new List<INotificationSubscriber>();
+                this.userValidate = new CompositeValidation();
+            }
 
-                slaveServices = new List<IUserStorageService>();
+            this.users = new HashSet<User>();
+        }
 
-                this.slaveServices = slaves.ToList();
-
-                foreach (var sub in slaves)
-                {
-                    subscribers.Add((INotificationSubscriber)sub);
-                }
+        protected UserStorageServiceBase(IEnumerable<User> users, IUserValidate<User> validator = null) : this(validator)
+        {
+            foreach (User u in users)
+            {
+                this.Add(u);
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public UserStorageService()
+        protected UserStorageServiceBase(IUserValidate<User> validator = null, params User[] users) : this(validator)
         {
-            users = new HashSet<User>();
+            foreach (User u in users)
+            {
+                this.Add(u);
+            }
         }
 
         /// <summary>
@@ -66,38 +62,17 @@ namespace UserStorageServices
         /// <returns>An amount of users in the storage.</returns>
         public int Count { get; }
 
+        public abstract UserStorageServiceMode ServiceMode { get; }
+
         /// <summary>
         /// Adds a new <see cref="User"/> to the storage.
         /// </summary>
         /// <param name="user">A new <see cref="User"/> that will be added to the storage.</param>
-        public void Add(User user)
+        public virtual void Add(User user)
         {
-            if (!OperationAllowed())
-            {
-                throw new NotSupportedException();
-            }
+            this.userValidate.Validate(user);
 
-            userValidate.Validate(user);
-
-            if (mode == UserStorageServiceMode.MasterNode && slaveServices != null)
-            {
-                foreach (var service in slaveServices)
-                {
-                    service.Add(user);
-                }
-            }
-            else
-            {
-                this.users.Add(user);
-            }
-
-            if (mode == UserStorageServiceMode.MasterNode)
-            {
-                foreach (var sub in subscribers)
-                {
-                    sub.UserAdded(user);
-                }
-            }
+            this.users.Add(user);
         }
 
         public void UserAdded(User user)
@@ -107,91 +82,43 @@ namespace UserStorageServices
 
         public void UserRemoved(User user)
         {
-
             Trace.Write("For Subscriber : User removed");
-        }
-
-        public void AddSubscriber(INotificationSubscriber sub)
-        {
-            if (mode == UserStorageServiceMode.SlaveNode) return;
-            if (sub == null) throw new ArgumentNullException($"{nameof(sub)} is null");
-            subscribers.Add(sub);
-        }
-
-        public void RemoveSubscriber(INotificationSubscriber sub)
-        {
-            if (mode == UserStorageServiceMode.SlaveNode) return;
-            if (sub == null) throw new ArgumentNullException($"{nameof(sub)} is null");
-            if (!subscribers.Contains(sub)) throw new InvalidOperationException("No such subscruber was found");
-            subscribers.Remove(sub);
-        }
+        }      
 
         /// <summary>
         /// Removes an existed <see cref="User"/> from the storage.
         /// </summary>
-        public void Remove(User user)
+        public virtual void Remove(User user)
         {
             if (user == null)
             {
                 throw new ArgumentNullException(nameof(user));
             }
 
-            if (!OperationAllowed())
+            if (user.Id == Guid.Empty || string.IsNullOrWhiteSpace(user.FirstName) || string.IsNullOrWhiteSpace(user.LastName))
             {
-                throw new NotSupportedException();
+                throw new ArgumentException($"User {nameof(user)} is not defined");
             }
 
-            if (mode == UserStorageServiceMode.MasterNode)
+            if (!this.Contains(user))
             {
-                foreach (var service in slaveServices)
-                {
-                    service.Remove(user);
-                }
-            }
-            else
-            {
-                if (!this.users.Remove(user))
-                {
-                    throw new ArgumentNullException("No user with such Id was found");
-                }
+                throw new ArgumentException("No user with such Id was found");
             }
 
-            if (mode == UserStorageServiceMode.MasterNode)
-            {
-                foreach (var sub in subscribers)
-                {
-                    sub.UserRemoved(user);
-                }
-            }
+            this.users.Remove(user);
         }
 
         /// <summary>
         /// Searches through the storage for a <see cref="User"/> that matches specified criteria.
         /// </summary>
-        public IEnumerable<User> Search(Predicate<User> comparer)
+        public virtual IEnumerable<User> Search(Predicate<User> comparer)
         {
             if (comparer == null)
             {
                 throw new ArgumentNullException(nameof(comparer));
             }
 
-            if (mode == UserStorageServiceMode.SlaveNode)
-            {
-                return this.Search(comparer);
-            }
-            else
-            {
-                List<User> result = new List<User>();
-                foreach (var service in slaveServices)
-                {
-                    if (service.Search(comparer) != null)
-                    {
-                        result.AddRange(service.Search(comparer));
-                    }
-                }
-
-                return result;
-            }
+            return this.Search(comparer);            
         }
 
         /// <summary>
@@ -206,7 +133,7 @@ namespace UserStorageServices
                 throw new FirstNameIsNullOrEmptyException("FirstName invalid");
             }
 
-            return Search(x => x.FirstName == firstName);
+            return this.Search(x => x.FirstName == firstName);
         }
 
         /// <summary>
@@ -221,7 +148,7 @@ namespace UserStorageServices
                 throw new LastNameIsNullOrEmptyException("LastName invalid");
             }
 
-            return Search(x => x.LastName == lastName);
+            return this.Search(x => x.LastName == lastName);
         }
 
         /// <summary>
@@ -236,7 +163,7 @@ namespace UserStorageServices
                 throw new AgeExceedsLimitsException("Age invalid");
             }
 
-            return Search(x => x.Age == age);
+            return this.Search(x => x.Age == age);
         }
 
         public IEnumerable<User> SearchByFirstNameAndLastName(string firstName, string lastName)
@@ -251,7 +178,7 @@ namespace UserStorageServices
                 throw new LastNameIsNullOrEmptyException("LastName is null or empty");
             }
 
-            return Search(x => x.FirstName == firstName && x.LastName == lastName);
+            return this.Search(x => x.FirstName == firstName && x.LastName == lastName);
         }
 
         public IEnumerable<User> SearchByFirstNameAndAge(string firstName, int age)
@@ -266,7 +193,7 @@ namespace UserStorageServices
                 throw new AgeExceedsLimitsException("Age invalid");
             }
 
-            return Search(x => x.FirstName == firstName && x.Age == age);
+            return this.Search(x => x.FirstName == firstName && x.Age == age);
         }
 
         public IEnumerable<User> SearchByLastNameAndAge(string lastName, int age)
@@ -281,7 +208,7 @@ namespace UserStorageServices
                 throw new AgeExceedsLimitsException("Age invalid");
             }
 
-            return Search(x => x.LastName == lastName && x.Age == age);
+            return this.Search(x => x.LastName == lastName && x.Age == age);
         }
 
         public IEnumerable<User> SearchByFirstNameAndLastNameAndAge(string firstName, string lastName, int age)
@@ -301,29 +228,9 @@ namespace UserStorageServices
                 throw new AgeExceedsLimitsException("Age invalid");
             }
 
-            return Search(x => x.FirstName == firstName && x.LastName == lastName && x.Age == age);
+            return this.Search(x => x.FirstName == firstName && x.LastName == lastName && x.Age == age);
         }
 
-        private bool OperationAllowed()
-        {
-            StackTrace stack = new StackTrace();
-            var currentMethod = stack.GetFrame(1).GetMethod();
-            var stackFramesContainsCurrentMethod = stack.GetFrames();
-            var counterOfSameFrames = 0;
-            foreach (var frame in stackFramesContainsCurrentMethod)
-            {
-                if (frame.GetMethod() == currentMethod)
-                {
-                    counterOfSameFrames++;
-                }
-
-                if (counterOfSameFrames >= 2)
-                {
-                    break;
-                }
-            }
-
-            return mode == UserStorageServiceMode.MasterNode || counterOfSameFrames >= 2;
-        }
+        private bool Contains(User user) => this.users.Any(u => u.Id == user.Id);
     }
 }
