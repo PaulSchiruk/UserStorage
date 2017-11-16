@@ -8,26 +8,14 @@ namespace UserStorageServices
 {
     public interface IUserStorageService
     {
+        UserStorageServiceMode ServiceMode { get; }
+
         int Count { get; }
 
         void Add(User user);
 
-        bool Remove(User user);
-
-        IEnumerable<User> SearchByFirstName(string firstName);
-
-        IEnumerable<User> SearchByLastName(string lastName);
-
-        IEnumerable<User> SearchByAge(int age);
+        void Remove(User user);
 
         IEnumerable<User> Search(Predicate<User> comparer);
-
-        IEnumerable<User> SearchByFirstNameAndLastName(string firstName, string lastName);
-
-        IEnumerable<User> SearchByFirstNameAndAge(string firstName, int age);
-
-        IEnumerable<User> SearchByLastNameAndAge(string lastName, int age);
-
-        IEnumerable<User> SearchByFirstNameAndLastNameAndAge(string firstName, string lastName, int age);
     }
 }

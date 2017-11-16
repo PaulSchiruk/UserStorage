@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace UserStorageServices.Validation
 {
-     public class CompositeValidation : IUserValidate
+     public class CompositeValidation : IUserValidate<User>
     {
-        private readonly IUserValidate[] validators;
+        private readonly IUserValidate<User>[] validators;
 
         public CompositeValidation()
         {
-            validators = new IUserValidate[]
+            validators = new IUserValidate<User>[]
             {
                 new AgeValidation(),
                 new FirstNameValidation(),

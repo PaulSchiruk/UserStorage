@@ -15,26 +15,14 @@ namespace UserStorageServices
             this.StorageService = storageService;
         }
 
+        public UserStorageServiceMode ServiceMode { get; }
+
         public abstract int Count { get; }
 
         public abstract void Add(User user);
 
-        public abstract bool Remove(User user);
+        public abstract void Remove(User user);
 
         public abstract IEnumerable<User> Search(Predicate<User> comparer);
-
-        public abstract IEnumerable<User> SearchByAge(int age);
-
-        public abstract IEnumerable<User> SearchByFirstName(string firstName);
-
-        public abstract IEnumerable<User> SearchByFirstNameAndAge(string firstName, int age);
-
-        public abstract IEnumerable<User> SearchByFirstNameAndLastName(string firstName, string lastName);
-
-        public abstract IEnumerable<User> SearchByFirstNameAndLastNameAndAge(string firstName, string lastName, int age);
-
-        public abstract IEnumerable<User> SearchByLastName(string lastName);
-
-        public abstract IEnumerable<User> SearchByLastNameAndAge(string lastName, int age);
-    }
+        }
 }

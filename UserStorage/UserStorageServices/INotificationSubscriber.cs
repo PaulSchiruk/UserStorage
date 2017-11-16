@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace UserStorageServices
 {
-    public interface IUserValidate<T>
+    public interface INotificationSubscriber
     {
-        void Validate(T user);
+        void UserAdded(User user);
+
+        void UserRemoved(User user);
     }
 }
