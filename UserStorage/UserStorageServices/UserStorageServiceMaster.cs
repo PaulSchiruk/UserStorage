@@ -24,6 +24,10 @@ namespace UserStorageServices
             }
         }
 
+        private event Action<User> UserAdded;
+
+        private event Action<User> UserRemoved;
+
         public override UserStorageServiceMode ServiceMode => UserStorageServiceMode.MasterNode;
 
         public override void Add(User user)
@@ -34,10 +38,7 @@ namespace UserStorageServices
                 ss.Add(user);
             }
 
-            foreach (var sub in this.subscribers)
-            {
-                sub.UserAdded(user);
-            }
+            this.OnUserAdded(user);
         }
 
         public override void Remove(User user)
@@ -48,10 +49,7 @@ namespace UserStorageServices
                 ss.Remove(user);
             }
 
-            foreach (var sub in this.subscribers)
-            {
-                sub.UserRemoved(user);
-            }
+            this.OnUserRemoved(user);
         }
 
         public override IEnumerable<User> Search(Predicate<User> predicate)
@@ -81,6 +79,8 @@ namespace UserStorageServices
             }
 
             this.subscribers.Add(sub);
+            this.UserAdded += sub.UserAdded;
+            this.UserRemoved += sub.UserRemoved;
         }
 
         public void RemoveSubscriber(INotificationSubscriber sub)
@@ -96,6 +96,19 @@ namespace UserStorageServices
             }
 
             this.subscribers.Remove(sub);
+            this.UserAdded -= sub.UserAdded;
+            this.UserRemoved += sub.UserRemoved;
+        }
+
+        private void OnUserAdded(User user)
+        {
+            var x = this.UserAdded;
+            this.UserAdded?.Invoke(user);
+        }
+
+        private void OnUserRemoved(User user)
+        {
+            this.UserRemoved?.Invoke(user);
         }
     }
 }

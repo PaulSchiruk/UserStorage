@@ -16,7 +16,7 @@ namespace UserStorageServices
     /// <summary>
     /// Represents a service that stores a set of <see cref="User"/>s and allows to search through them.
     /// </summary>
-    public abstract class UserStorageServiceBase : Switch, IUserStorageService, INotificationSubscriber
+    public abstract class UserStorageServiceBase : Switch, IUserStorageService
     {
         /// <summary>
         /// Users set
@@ -74,17 +74,7 @@ namespace UserStorageServices
 
             this.users.Add(user);
         }
-
-        public void UserAdded(User user)
-        {
-            Trace.Write("For Subscriber : User added");
-        }
-
-        public void UserRemoved(User user)
-        {
-            Trace.Write("For Subscriber : User removed");
-        }      
-
+        
         /// <summary>
         /// Removes an existed <see cref="User"/> from the storage.
         /// </summary>

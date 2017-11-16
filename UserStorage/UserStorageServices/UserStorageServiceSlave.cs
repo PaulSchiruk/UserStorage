@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace UserStorageServices
 {
-    public class UserStorageServiceSlave : UserStorageServiceBase
+    public class UserStorageServiceSlave : UserStorageServiceBase, INotificationSubscriber
     {
         public UserStorageServiceSlave(IUserValidate<User> validator = null) : base(validator)
         {
@@ -37,6 +37,16 @@ namespace UserStorageServices
             {
                 throw new NotSupportedException("You don't have enough access lavel");
             }
+        }
+
+        public void UserAdded(User user)
+        {
+            Trace.WriteLine("For Subscriber : User added");
+        }
+
+        public void UserRemoved(User user)
+        {
+            Trace.WriteLine("For Subscriber : User removed");
         }
 
         private static bool OperationAllowed()
